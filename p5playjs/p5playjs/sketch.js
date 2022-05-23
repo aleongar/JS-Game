@@ -5,6 +5,8 @@ let canJump
 let absorb
 let facingRight = true
 let canMove = true
+let absorbing = false
+let absorbedData = "Nothing"
 
 function setup() {
   createCanvas(600, 600)
@@ -32,23 +34,42 @@ function draw() {
 	}else{
     canJump = false
   }
-  if(keyWentDown('x')){
+  if(keyWentDown('x') && absorbedData == "Nothing"){
     facingRight ? absorb = createSprite(spr.position.x + 30, spr.position.y, 50, 20) : absorb = createSprite(spr.position.x + -30, spr.position.y, 50, 20)
     absorb.shapeColor = color(125)
-    spr.velocity.x = 0
     canMove = false
     canJump = false
+    absorbing = true
+    if(absorb.overlap(enemy)){
+      enemy.remove()
+      absorb.remove()
+      absorbedData = "Sword"
+      spr.shapeColor = color(0,150,0)
+    }
+  }
+
+  if(keyWentDown('x') && absorbedData == "Sword"){
+    facingRight ? absorb = createSprite(spr.position.x + 30, spr.position.y, 20, 50) : absorb = createSprite(spr.position.x + -30, spr.position.y, 20, 50)
+    absorb.shapeColor = color(10, 0, 240)
   }
   if(keyWentUp('x')){
     absorb.remove()
     canMove = true
     canJump = true
+    absorbing = false
   }
 
-  if(keyWentDown('z') && canJump){
+  if(keyWentDown('z') && canJump && !absorbing){
     spr.velocity.y = -15
   }
-   
+
+  if(absorbing){
+    absorb.position.y = spr.position.y
+    absorb.position.x = facingRight ? spr.position.x +30 : spr.position.x -30
+    if(spr.collide(floor)){
+      spr.velocity.x = 0
+    }
+  }   
   
   if(keyWentDown(LEFT_ARROW) && canMove){
     spr.velocity.x = -4
@@ -61,6 +82,7 @@ function draw() {
   if(keyWentUp(LEFT_ARROW) || keyWentUp(RIGHT_ARROW)){
     spr.velocity.x = 0
   }
+  
 }
 
 
